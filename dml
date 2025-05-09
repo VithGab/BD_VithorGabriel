@@ -1,0 +1,80 @@
+-----ATUALIZACOES DE REGISTROS----------
+UPDATE manutencoes SET data_fim = '2023-03-14'
+WHERE id_veiculo = 9;
+
+---INNER JOIN PARA VER A RELACAO DOS DADOS DA LOCACAO.-----------------------------------------
+SELECT l.id_locacao, c.nome as cliente, c.id_cliente, v.modelo, v.placa
+FROM locacao l
+INNER JOIN clientes c ON l.id_cliente = c.id_cliente
+INNER JOIN veiculo v ON l.id_veiculo = v.id_veiculo;
+
+---JOIN P/CLIENTES QUE NÃO REALIZARAM LOCACAO---------------
+SELECT c.id_cliente, c.nome as cliente, c.email
+FROM clientes c
+LEFT JOIN locacao l ON c.id_cliente = l.id_cliente
+WHERE l.id_cliente IS NULL;
+
+---DELETANDO:       --------------------------------------------------
+DELETE FROM clientes
+WHERE id_cliente IN (
+SELECT c.id_cliente
+FROM clientes c
+LEFT JOIN locacao l ON c.id_cliente = l.id_cliente
+WHERE l.id_cliente IS NULL);
+
+
+--LOCACAO DE UM DETERMINADO CLIENTE PELO ID-------------------------
+SELECT l.id_locacao, c.nome, c.id_cliente, v.modelo, v.placa
+FROM locacao l
+INNER JOIN clientes c ON l.id_cliente = c.id_cliente
+INNER JOIN veiculo v ON l.id_veiculo = v.id_veiculo
+WHERE c.id_cliente = 1;
+
+--VISUALIZACAO DE LOCACAO POR LETRAS NO NOME DO CLIENTE------------------
+SELECT l.id_locacao, c.nome, c.id_cliente, v.modelo, v.placa
+FROM locacao l
+INNER JOIN clientes c ON l.id_cliente = c.id_cliente
+INNER JOIN veiculo v ON l.id_veiculo = v.id_veiculo
+WHERE c.nome LIKE 'M%';
+
+---SITUACAO DA MANUTENCAO DO CARRO----------------------------
+SELECT v.modelo, v.placa, m.status_manutencao
+FROM manutencoes m
+INNER JOIN veiculo v ON m.id_veiculo = v.id_veiculo;
+
+---SITUACAO PAGAMENTO DOS CLIENTES EM ORDEM ALFABETICA-------------------------------
+SELECT p.data_pagamento, v.id_veiculo, p.valor_total, c.nome, p.status_pagamento
+FROM pagamentos p
+INNER JOIN locacao l ON p.id_locacao = l.id_locacao
+INNER JOIN veiculo v ON l.id_veiculo = v.id_veiculo
+INNER JOIN clientes c ON L.id_cliente = c.id_cliente
+ORDER BY c.nome ASC
+;
+---PAGAMENTO DE CLINTES QUE O NOME INICIA COM P-----------------
+SELECT p.data_pagamento, v.id_veiculo, p.valor_total, c.nome, p.status_pagamento
+FROM pagamentos p
+INNER JOIN locacao l ON p.id_locacao = l.id_locacao
+INNER JOIN veiculo v ON l.id_veiculo = v.id_veiculo
+INNER JOIN clientes c ON L.id_cliente = c.id_cliente
+WHERE c.nome LIKE 'P%';
+
+---VEICULOS QUE TEM A LETRA 'O' EM QUALQUER PARTE DO NOME------
+SELECT modelo
+FROM veiculo
+WHERE modelo ILIKE '%O%';
+
+---ORGANIZANDO MANUTENCOES PELA DATA DE INICIO POR ORDEM DECRESCENTE-------------------------
+SELECT id_veiculo, data_inicio, data_fim
+FROM manutencoes
+ORDER BY data_inicio DESC;
+
+---CONSULTA VEICULO PELA DATA DA LOCACAO-----------
+SELECT v.modelo, v.marca, v.tipo_veiculo, l.data_locacao
+FROM veiculo v
+INNER JOIN locacao l ON l.id_veiculo = v.id_veiculo
+WHERE l.data_locacao = '2023-04-10';
+
+---MEDIA DO PIX -----
+SELECT AVG(valor_pago)::DECIMAL(10,2) AS media_pix
+FROM pagamentos
+WHERE metodo_pagamento ILIKE 'PIX';
